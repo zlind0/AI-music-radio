@@ -31,7 +31,7 @@ def get_desc(title, album, artist, dummy=False):
         time.sleep(1)
         return "观众朋友，欢迎收听古典音乐频道。让我们开始吧！"
     else:
-        prompt = f"你是一个古典音乐电台的主持人，下面你要播放的是{artist}的{title}({album})，请解说一下这首作品。请用一两分钟介绍这首作品本身，比如创作背景、作曲手法等等，一定不要讲任何空洞的废话，要尽可能讲音乐专业的内容。解说词里一定不可以有任何外文。100-150字左右。不要任何起承转合的套话。"
+        prompt = f"你是一个古典音乐电台的主持人，下面你要播放的是{artist}的{title}({album})，请解说一下这首作品。请用一两分钟介绍这首作品本身，比如创作背景、作曲手法等等，一定不要讲任何空洞的废话，要尽可能讲音乐专业的内容。解说词里一定不可以有任何外文。你必须只提供有效真实的信息，不要任何起承转合的套话。"
         logger.info(f"PROMPT: {prompt}")
         
         response = client.chat.completions.create(
@@ -52,8 +52,11 @@ def get_desc(title, album, artist, dummy=False):
         return res
 
 def speak(cntt):
-    subprocess.run(["say", cntt])
+    with open('/tmp/ai_radio_tmp_say.txt','w') as f:
+        f.write(cntt)
+    subprocess.run("say -f /tmp/ai_radio_tmp_say.txt", shell=True)
     time.sleep(0.2)
+    os.unlink('/tmp/ai_radio_tmp_say.txt')
     
 def set_music_play():
     subprocess.run("./nowplaying-cli play", shell=True)
